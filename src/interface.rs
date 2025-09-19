@@ -507,7 +507,7 @@ impl Nl80211Mock {
         crate::macos_interface::set_interface_mac_macos(ifindex, mac)
     }
 
-    pub fn set_interface_monitor(&self, active: bool, ifindex: i32) -> Result<(), String> {
+    pub fn set_interface_monitor(&self, ifindex: i32) -> Result<(), String> {
         #[cfg(target_os = "macos")]
         {
             use crate::airport;
@@ -515,13 +515,8 @@ impl Nl80211Mock {
             // Get interface name
             let ifname = self.get_interface_name_from_index(ifindex)?;
 
-            if active {
-                // Enable monitor mode using airport utility
-                airport::enable_monitor_mode(&ifname)?;
-            } else {
-                // Disable monitor mode
-                airport::disable_monitor_mode(&ifname)?;
-            }
+            // Enable monitor mode using airport utility
+            airport::enable_monitor_mode(&ifname)?;
 
             Ok(())
         }

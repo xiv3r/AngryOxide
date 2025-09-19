@@ -119,7 +119,7 @@ use clap::{ArgAction, Parser};
 
 #[derive(Parser)]
 #[command(name = "AngryOxide")]
-#[command(author = "Ryan Butler (rage)")]
+#[command(author = "Ryan Butler (rage) plus other greate contributors!")]
 #[command(about = "Does awesome things... with wifi.", long_about = None)]
 #[command(version)]
 struct Arguments {
@@ -165,7 +165,7 @@ struct Arguments {
 
     /// Optional - Disable Active Monitor mode.
     #[arg(long, help_heading = "Advanced Options")]
-    noactive: bool,
+    active: bool,
 
     /// Optional - Tx MAC for rogue-based attacks - will randomize if excluded.
     #[arg(long, help_heading = "Advanced Options", name = "MAC Address")]
@@ -927,7 +927,7 @@ impl OxideRuntime {
         println!(
             "💲 Setting {} to Monitor mode. (\"active\" flag: {})",
             interface_name,
-            (iface.phy.clone().unwrap().active_monitor.is_some_and(|x| x) && !cli_args.noactive)
+            (iface.phy.clone().unwrap().active_monitor.is_some_and(|x| x) && cli_args.active)
         );
 
         #[cfg(target_os = "macos")]
@@ -935,7 +935,7 @@ impl OxideRuntime {
 
         #[cfg(target_os = "linux")]
         {
-            if iface.phy.clone().unwrap().active_monitor.is_some_and(|x| x) && !cli_args.noactive {
+            if iface.phy.clone().unwrap().active_monitor.is_some_and(|x| x) && cli_args.active {
                 netlink.set_interface_monitor(true, idx as u32).ok();
             } else {
                 netlink.set_interface_monitor(false, idx as u32).ok();
@@ -945,7 +945,7 @@ impl OxideRuntime {
         #[cfg(target_os = "macos")]
         {
             // On macOS, we always use the same monitor mode approach
-            netlink.set_interface_monitor(!cli_args.noactive, idx).ok();
+            netlink.set_interface_monitor(idx).ok();
         }
 
         if let Ok(after) = get_interface_info(idx) {
